@@ -1,0 +1,410 @@
+---
+layout: base
+title: "景点路线规划2"
+permalink: /map-road-plan2/
+---
+<style type="text/css">
+	body {
+	    /*color: #fff;
+	    font: 300 100.1% "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;*/
+	}
+	#holder {
+		width: 620px;
+	    height: 420px;
+	    background: #333;
+	}
+</style>
+
+<div class="row-fluid">
+	<div class="span12">
+		<ul class="nav nav-tabs">
+		  <li><a href="#">景点类型设置</a></li>
+		  <li>
+		    <a href="#">添加景点信息</a>
+		  </li>
+		  <li class="active"><a href="#">景点路线规划</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="row-fluid">
+	<div class="span12">
+		<div id="holder"></div>
+		<hr />
+		<label class="label">当前点击位置:<span id="id_xy"></span></label>
+		<label class="label label-info">当前点击状态:<span id="id_click_status"></span></label>
+	</div>
+</div>
+
+<div id="myModal" class="modal hide fade">
+  <div class="modal-header">
+    <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+    <h3>请注意:</h3>
+  </div>
+  <div class="modal-body">
+    <p>由于您的点的位置够风骚,程序已无法分辨位置..劳烦确认您确认下到底要选哪一项?</p>
+    <div id="id_mbc"></div>
+  </div>
+  <div class="modal-footer">
+    <!-- <a href="#" class="btn">关闭</a>
+    <a href="#" class="btn btn-primary">Save changes</a> -->
+  </div>
+</div>
+
+<script type="text/javascript">
+var paper = null;
+$(document).ready(function(){
+	var r = Raphael("holder", 620, 420),
+        discattr = {fill: "#fff", stroke: "red"};
+        paper = r;
+	//原生创建方式
+    //r.add( json );
+    //根据 json 数据创建节点
+    generate_map_node();
+});
+
+var json = [
+    {
+        "type": "image",
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 420,
+        "src": "/assets/img/map.png",
+        "data": {
+            "type": "bg",
+            "title": "背景图"
+        }
+    },
+    {
+        "type": "image",
+        "x": "20",
+        "y": "20",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "狮子山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "99",
+        "y": "88",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "龙虎门"
+        }
+    },
+    {
+        "type": "image",
+        "x": "200",
+        "y": "144",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "五指山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "300",
+        "y": "339",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "渣滓洞"
+        }
+    },
+    {
+        "type": "image",
+        "x": "400",
+        "y": "400",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "牛栏山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "600",
+        "y": "175",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "马兰坡"
+        }
+    },
+    {
+        "type": "image",
+        "x": "555",
+        "y": "222",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "牛头马面山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "566",
+        "y": "232",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "牛头马面河"
+        }
+    }
+]
+//生成地图数据节点
+var info_arr = new Array();
+var generate_map_node = function(){
+	$.each( json , function( index , val ) {
+		if( val.type == "image" ){
+		 	var tmp = paper.image( val.src , val.x , val.y , val.width , val.height );
+		 	if( val.data.type != "bg" ){
+		 		tmp.data({
+		 			"type":val.data.type,
+		 			"title":val.data.title,
+		 			"original":val.src
+		 		}).attr({
+		 			"title":val.data.title
+		 		});
+		 		tmp.hover(function() {
+		 			this.attr({"src":"/assets/img/icon-map-png/location2.png"});
+		 		}, function() {
+		 			this.attr({"src": tmp.data('original')});
+		 		});
+		 		info_arr.push( tmp );
+		 	}
+		 }
+	});
+}
+
+var startX = null,
+    startY = null,
+    linePath = null,
+    lineObj = null,
+    //基点1
+    base1 = null,
+    //基点2
+    base2 = null;
+var point_xy = new Array();
+$("#holder").bind("click",function( e ){
+	e.preventDefault();
+
+	var x = e.offsetX; //当前点击位置的 X 坐标
+	var y = e.offsetY; //当前点击位置的 Y 坐标
+    
+    if( startX == x && startY == y )
+        return;
+
+    var tmp_arr = new Array();
+
+	$.each( info_arr , function( index , val ) {
+ 
+        var tmp_x = parse_num(val.attr("x")) ;
+        var tmp_x1 = tmp_x + 20 ;
+        var tmp_y = parse_num(val.attr("y")) ;
+        var tmp_y1 = tmp_y + 20 ;
+ 
+        //点按在基点上 573,238
+        if( x >= tmp_x && x <= tmp_x1 && y >= tmp_y && y <= tmp_y1 ){
+            //检查有哪些点符合条件
+            tmp_arr.push( val );
+        }
+        
+	});
+
+    var $p = $("#id_mbc");
+    $p.html("");
+
+    //当选项中的基点大于1个时,由用户选择其中一个点作为基点
+    if( tmp_arr.length > 1 ){
+        //弹出对话框询问用户到底选的谁?
+        $.each( tmp_arr , function(index, val) {
+             var a_ele = $("<a></a>");
+             a_ele.text( val.data("title") );
+             a_ele.addClass('btn btn-link');
+             a_ele.bind("click",function(){
+                
+                if( base1 == null ){
+                    base1 = val;
+                    //设置起始点
+                    startX = parse_num(val.attr("x")) + 10 ;
+                    startY = parse_num(val.attr("y")) + 10 ;
+                    point_xy.push( startX + "," + startY );
+                }else if( base2 == null ){
+                    base2 = val;
+                    //结束这条线
+                    linePath += "M" + startX + "," + startY + "L" + x + "," + y;
+                    point_xy.push( x + "," + y );
+                    if( lineObj != undefined ){
+                        lineObj.remove();
+                    }
+                    lineObj = generate_map_path( linePath );
+                    lineObj.data({
+                        "base1" : base1,
+                        "base2" : base2,
+                        "path" : point_xy
+                    });
+                    lineObj.hover(function() {
+                        this.attr({
+                            "stroke":"blue",
+                            "stroke-width":4
+                        });
+                    }, function() {
+                        this.attr({
+                            "stroke":"red",
+                            "stroke-width":2
+                        });
+                    });
+                    lineObj.attr({
+                        "cursor":"pointer"
+                    });
+                    lineObj.click(function(){
+                        console.log( this.data() );
+                    });
+                    startX = null;
+                    startY = null;
+                    linePath = null;
+                    lineObj = null;
+                    base1 = null;
+                    base2 = null;
+                    point_xy = [];
+                }
+                $('#myModal').modal('hide');
+             });
+             $p.append( a_ele );
+        });
+        $('#myModal').modal({
+            show: true,
+            keyboard: false
+        });
+    }
+    //当选项中的基点等于1个时,此点作为一个基点
+    else if( tmp_arr.length == 1 ){
+        if( base1 == null ){
+            base1 = tmp_arr[0];
+            //设置起始点
+            startX = parse_num(base1.attr("x")) + 10 ;
+            startY = parse_num(base1.attr("y")) + 10 ;
+            point_xy.push( startX + "," + startY );
+        }else if( base2 == null ){
+            base2 = tmp_arr[0];
+            //结束这条线
+            linePath += "M" + startX + "," + startY + "L" + x + "," + y;
+            point_xy.push( x + "," + y );
+            if( lineObj != undefined ){
+                lineObj.remove();
+            }
+            lineObj = generate_map_path( linePath );
+            lineObj.data({
+                "base1" : base1,
+                "base2" : base2,
+                "path" : point_xy
+            });
+            lineObj.hover(function() {
+                this.attr({
+                    "stroke":"blue",
+                    "stroke-width":4
+                });
+            }, function() {
+                this.attr({
+                    "stroke":"red",
+                    "stroke-width":2
+                });
+            });
+            lineObj.attr({
+                "cursor":"pointer"
+            });
+            lineObj.click(function(){
+                console.log( this.data() );
+            });
+            lineObj.dblclick(function(event) {
+                this.remove();
+            });
+            startX = null;
+            startY = null;
+            linePath = null;
+            lineObj = null;
+            base1 = null;
+            base2 = null;
+            point_xy = [];
+        }
+    }
+    //当选项中不存在基点时,那此点作为一个过度点
+    else if( tmp_arr.length < 1 ){
+
+        if( startX == null || startY == null ){
+            console.log("点了也没白点..这是个废点.");
+        }
+        else{
+            linePath += "M" + startX + "," + startY + "L" + x + "," + y;
+            point_xy.push( x + "," + y );
+            if( lineObj != undefined ){
+                lineObj.remove();
+            }
+            lineObj = generate_map_path( linePath );
+            lineObj.data({
+                "base1" : base1,
+                "base2" : base2
+            });
+            startX = x;
+            startY = y;
+        }
+
+    }
+    
+
+});
+
+$('#myModal').on('hidden', function () {
+  // do something…
+  console.log("关了她");
+})
+
+/* 将字符串转换为数字 */
+var parse_num = function( num ){
+	num = parseInt( num );
+	return num;
+}
+
+var generate_map_path = function( path_str ){
+	var path_ele = paper.path( path_str ).attr({
+		"stroke":"red",
+		"stroke-width":2
+	});
+	return path_ele;
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

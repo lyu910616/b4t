@@ -1,0 +1,33 @@
+<div class="span2">
+    <ul class="nav nav-list">
+        <li class="active"><a href="#"><i class="icon-home"></i> 首页</a></li>
+        <li class="nav-header">景区服务</li>
+        <li><a href="#">语音播报管理</a></li>
+        <li><a href="#">人流量管理</a></li>
+        <li><a href="#">活动管理</a></li>
+        <li><a href="#">电子屏幕</a></li>
+        <li><a href="#">服务管理</a></li>
+        <li><a href="#">留言管理 <span class="badge badge-important pull-right">99</span></a></li>
+
+        <li class="nav-header">景区建设</li>
+        <li><a href="#"><i class="icon-signal"></i> 设备管理</a></li>
+        <li><a href="#"><i class="icon-th"></i> 推荐路线</a></li>
+        <li><a href="#"><i class="icon-map-marker"></i> 地图设施管理 *</a></li>
+        <li><a href="#" class="text-error"><i class="icon-globe"></i> 地图管理 *</a></li>
+
+        <li class="nav-header">数据服务</li>
+        <li class="disabled"><a href="#">数据统计</a></li>
+        <li class="divider"></li>
+        <li><a href="#"><i class="icon-question-sign"></i> 帮助</a></li>
+    </ul>
+    <ul class="nav nav-list">
+        <li>&copy; 上海联璧电子科技 2014-2015</li>
+    </ul>
+    <ul class="nav nav-list">
+    {% for page in site.pages %}
+        {% if page.title %}
+        <li><a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+</div>

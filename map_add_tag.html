@@ -1,0 +1,144 @@
+---
+layout: base
+title: "添加景点信息"
+permalink: /map-add-tag/
+---
+<style type="text/css">
+	body {
+	    /*color: #fff;
+	    font: 300 100.1% "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;*/
+	}
+	#holder {
+		width: 620px;
+	    height: 420px;
+	    background: #333;
+	}
+</style>
+<ul class="nav nav-tabs">
+  <li><a href="#">景点类型设置</a></li>
+  <li class="active">
+    <a href="#">添加景点信息</a>
+  </li>
+  <li><a href="#">景点路线规划</a></li>
+</ul>
+<div id="holder"></div>
+<fieldset>
+	<legend>Start</legend>
+	<div class="btn-group">
+	  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+	    新建一个？
+	    <span class="caret"></span>
+	  </a>
+	  <ul class="dropdown-menu">
+	    <li><a id="b1" href="javascript:;" data-type="景点">景点</a></li>
+	    <li><a id="b2" href="javascript:;">矩形</a></li>
+	  </ul>
+	</div>
+	<button id="id_get_all" class="btn">获取所有元素</button>
+</fieldset>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+	var r = Raphael("holder", 620, 420),
+        discattr = {fill: "#fff", stroke: "red"};
+    //创建外部矩形
+    r.image("{{ '/assets/img/map.png' }}",0,0,640,420).data({
+    	"haha":"hahahahah"
+    });
+    // r.rect(0, 0, 20, 20, 0).attr({stroke: "red",fill:"red"});
+    //创建文档中标题
+    //r.text(310, 20, "拉动测试").attr({fill: "#fff", "font-size": 16});
+
+    // function curve(x, y, ax, ay, bx, by, zx, zy, color) {
+    //     var path = [["M", x, y], ["C", ax, ay, bx, by, zx, zy]],
+    //         path2 = [["M", x, y], ["L", ax, ay], ["M", bx, by], ["L", zx, zy]],
+    //         curve = r.path(path).attr({stroke: color || Raphael.getColor(), "stroke-width": 4, "stroke-linecap": "round"}).click(function(){
+    //         	console.log("111");
+    //         }),
+    //         controls = r.set(
+    //             r.path(path2).attr({stroke: "#ccc", "stroke-dasharray": ". "}),
+    //             r.circle(x, y, 5).attr(discattr),
+    //             r.circle(ax, ay, 5).attr(discattr),
+    //             r.circle(bx, by, 5).attr(discattr),
+    //             r.circle(zx, zy, 5).attr(discattr)
+    //         );
+            
+        
+    // }
+	// curve(70, 100, 110, 100, 130, 200, 170, 200, "hsb(0, .75, .75)");
+	// 
+	$("#b1").bind("click",function(){
+		create_circle( r );
+		// return false;
+	})
+
+	var create_circle = function( r ){
+    	// r.circle(20,20,10).attr(
+    	// {
+    	// 	stroke:"red",
+    	// 	fill:"red",
+    	// 	cursor:"move",
+    	// 	title:"",
+    	// 	background:"{{ '/assets/img/glyphicons-halflings.png' | prepend: site.baseurl }}"
+    	// }).click(function(){
+    	// 	console.log( this.getBBox());
+    	// }).drag( move , start , up );
+		var c = r.image("{{ '/assets/img/icon-map-png/library.png' | prepend: site.baseurl }}", 20, 20, 20, 20)
+		.drag( move , start , up );
+    },
+
+    	move = function( dx , dy , x , y , e ){
+	    	var att = null ;
+	    	// if( this.type == "rect" ){
+	    	// 	console.log("1");
+	    	// 	att = {x: this.ox + dx, y: this.oy + dy};
+	    	// }else{
+	    	// 	console.log(this);
+	    	// 	att = {cx: this.ox + dx, cy: this.oy + dy};
+	    	// }
+	    	att = {
+	    		x : this.ox + dx,
+	    		y : this.oy + dy
+	    	}
+            this.attr(att);
+            r.safari();
+    },
+    	start = function(){
+    		// this.ox = this.type == "rect" ? this.attr("x") : this.attr("cx");
+	     //    this.oy = this.type == "rect" ? this.attr("y") : this.attr("cy");
+	     	this.ox = this.attr("x");
+	     	this.oy = this.attr("y");
+	        this.animate({"fill-opacity": .2}, 500);
+    },
+    	up = function(){
+    		this.animate({"fill-opacity": 1}, 500);
+    }
+
+    $("#id_get_all").bind("click",function(){
+    	var json = "[";
+    	r.forEach( function ( el ) {
+		    //el.attr({ stroke: "blue" });
+		    //console.log( el.getBBox() );
+		    json += "{";
+		    if( el.type=="image" ){
+		    	json += "type:'image',";
+		    	json += "x:" + el.getBBox().x + ",";
+		    	json += "y:" + el.getBBox().y + ",";
+		    	json += "width:" + el.getBBox().width + ",";
+		    	json += "height:" + el.getBBox().height + ",";
+		    	json += "src:" + "\"" + el.attr("src") + "\"";
+		    }
+		    json += "},"
+		});
+		json = json.substring( 0 , json.length - 1 );
+		json += "]"
+		console.log( json );
+    });
+
+    r.add([{type:'image',x:0,y:0,width:640,height:420,src:"/assets/img/map.png"},{type:'image',x:125,y:175,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:210,y:72,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:87,y:101,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:190,y:337,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:301,y:180,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:60,y:356,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:483,y:148,width:20,height:20,src:"/assets/img/icon-map-png/library.png"},{type:'image',x:450,y:323,width:20,height:20,src:"/assets/img/icon-map-png/library.png"}]);
+
+});
+	
+</script>

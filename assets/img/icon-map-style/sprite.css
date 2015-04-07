@@ -1,0 +1,85 @@
+.icon-map {
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-image: url(sprite.svg);
+}
+.icon-map-office {
+	width: 20px;
+	height: 20px;
+	background-position: 0 0;
+}
+.icon-map-connection {
+	width: 25px;
+	height: 20px;
+	background-position: -40px 0;
+}
+.icon-map-library {
+	width: 21px;
+	height: 20px;
+	background-position: -80px 0;
+}
+.icon-map-qrcode {
+	width: 20px;
+	height: 20px;
+	background-position: -120px 0;
+}
+.icon-map-credit-card {
+	width: 20px;
+	height: 20px;
+	background-position: -160px 0;
+}
+.icon-map-location2 {
+	width: 20px;
+	height: 20px;
+	background-position: -200px 0;
+}
+.icon-map-trophy {
+	width: 20px;
+	height: 20px;
+	background-position: -240px 0;
+}
+.icon-map-gift {
+	width: 20px;
+	height: 20px;
+	background-position: -280px 0;
+}
+.icon-map-glass2 {
+	width: 20px;
+	height: 20px;
+	background-position: -320px 0;
+}
+.icon-map-spoon-knife {
+	width: 20px;
+	height: 20px;
+	background-position: -360px 0;
+}
+.icon-map-airplane {
+	width: 20px;
+	height: 20px;
+	background-position: -400px 0;
+}
+.icon-map-truck {
+	width: 20px;
+	height: 20px;
+	background-position: -440px 0;
+}
+.icon-map-road {
+	width: 20px;
+	height: 20px;
+	background-position: -480px 0;
+}
+.icon-map-link {
+	width: 20px;
+	height: 20px;
+	background-position: -520px 0;
+}
+.icon-map-instagram {
+	width: 20px;
+	height: 20px;
+	background-position: -560px 0;
+}
+.icon-map-megaphone {
+	width: 20px;
+	height: 20px;
+	background-position: 0 -40px;
+}

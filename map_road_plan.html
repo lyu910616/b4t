@@ -1,0 +1,348 @@
+---
+layout: base
+title: "景点路线规划"
+permalink: /map-road-plan/
+---
+<style type="text/css">
+	body {
+	    /*color: #fff;
+	    font: 300 100.1% "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;*/
+	}
+	#holder {
+		width: 620px;
+	    height: 420px;
+	    background: #333;
+	}
+</style>
+
+<div class="row-fluid">
+	<div class="span12">
+		<ul class="nav nav-tabs">
+		  <li><a href="#">景点类型设置</a></li>
+		  <li>
+		    <a href="#">添加景点信息</a>
+		  </li>
+		  <li class="active"><a href="#">景点路线规划</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="row-fluid">
+	<div class="span12">
+		<p id="id_plan_info_title" class="lead">正在计算可规划线路信息..</p>
+		<div class="tabbable"> <!-- Only required for left/right tabs -->
+		  <ul class="nav nav-tabs">
+		    <li class="active"><a id="id_plan_info_nav" href="#tab1" data-toggle="tab">loading..</a></li>
+		  </ul>
+		  <div class="tab-content">
+		    <div id="id_plan_info_content" class="tab-pane active" id="tab1">
+		      <!-- //btn btn-link -->
+		      Loading..
+		    </div>
+		  </div>
+		</div>
+	</div>
+	<div class="span12">
+		<div id="holder"></div>	
+		<hr />
+		<label class="label">当前点击位置:<span id="id_xy"></span></label>
+		<label class="label label-info">当前点击状态:<span id="id_click_status"></span></label>
+		<a href="#" id="element" data-toggle="tooltip" title="first tooltip">hover over me</a>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+var paper = null;
+
+$(document).ready(function(){
+
+	var r = Raphael("holder", 620, 420),
+        discattr = {fill: "#fff", stroke: "red"};
+        paper = r;
+
+	//原生创建方式
+    //r.add( json );
+
+    //根据 json 数据创建节点
+    generate_map_node();
+	
+	//$('#element').tooltip('toggle')
+	$('#element').tooltip('toggle');
+});
+
+var json = [
+    {
+        "type": "image",
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 420,
+        "src": "/assets/img/map.png",
+        "data": {
+            "type": "bg",
+            "title": "背景图"
+        }
+    },
+    {
+        "type": "image",
+        "x": "20",
+        "y": "20",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "狮子山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "99",
+        "y": "88",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "龙虎门"
+        }
+    },
+    {
+        "type": "image",
+        "x": "200",
+        "y": "144",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "五指山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "300",
+        "y": "339",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "渣滓洞"
+        }
+    },
+    {
+        "type": "image",
+        "x": "400",
+        "y": "400",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "牛栏山"
+        }
+    },
+    {
+        "type": "image",
+        "x": "600",
+        "y": "175",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "马兰坡"
+        }
+    },
+    {
+        "type": "image",
+        "x": "555",
+        "y": "222",
+        "width": "20",
+        "height": "20",
+        "src": "/assets/img/icon-map-png/library.png",
+        "data": {
+            "type": "景点",
+            "title": "牛头马面山"
+        }
+    }
+]
+var config = {
+	tip:"#id_plan_info_title",
+	nav:"#id_plan_info_nav",
+	con:"#id_plan_info_content"
+}
+
+//生成地图数据节点
+var generate_map_node = function(){
+	var a_arr = new Array();
+	$.each(json, function(index, val) {
+		/* iterate through array or object */
+		if( val.type == "image" ){
+		 	var tmp = paper.image( val.src , val.x , val.y , val.width , val.height );
+		 	if( val.data.type != "bg" ){
+		 		tmp.data({
+		 			"type":val.data.type,
+		 			"title":val.data.title,
+		 			"original":val.src
+		 		}).attr({
+		 			"title":val.data.title
+		 		})
+				//将各节点对应至Tabs <a class="btn btn-link">anything.</a>
+				var a_ele = $(document.createElement("a"));
+				a_ele.addClass('btn btn-link');
+				a_ele.text( val.data.title );
+				a_ele.attr("data-forid", tmp.id );
+				a_ele.hover(function() {
+					focus_map_node( this );
+				}, function() {
+					focusout_map_node( this );
+				});
+				a_arr.push( a_ele );
+		 	}
+		 }
+	});
+
+	$( config.tip ).text("可规划路线的位置信息:")
+	$( config.nav ).text("所有位置信息");
+	$( config.con ).html("").append( a_arr );
+}
+
+var focus_map_node = function( self ){
+	var self = $(self);
+	var id = self.attr("data-forid");
+	var tmp = paper.getById( id );
+	tmp.attr({
+		"src":"/assets/img/icon-map-png/location2.png"
+	})
+}
+var focusout_map_node = function( self ){
+	var self = $(self);
+	var id = self.attr("data-forid");
+	var tmp = paper.getById( id );
+	tmp.attr({
+		"src": tmp.data('original')
+	})
+}
+
+var startX = null,
+	startY = null,
+	line_str = null,
+	line = null,
+	fx = null,	//第一个基点
+	fy = null,	//第二个基点
+	ft = false	//是否允许 fx 与 fy 为同一基点,  false 不允许 | true 允许
+$("#holder").bind("click",function( e ){
+	e.preventDefault();
+	var x = e.offsetX; //当前点击位置的 X 坐标
+	var y = e.offsetY; //当前点击位置的 Y 坐标
+
+	if( startX == x && startY == y ){
+		return;
+	}
+
+	$("#id_xy").text("X: " + x + " Y: " + y );
+	//查询这个点是什么
+	var tmpArr = paper.getElementsByPoint( x,y );
+	
+	//当数组长度大于1时才有可能点击到另外一个点,默认情况下数组长度为1.地图永远都在..
+
+	//当前点击到了基点上
+	if( tmpArr.length > 1 ){
+		//当前没有设置起始基点
+		if( startX == null || startY == null ){
+			$.each( tmpArr , function(index, val) {
+				 if( val.data("type") != "undefined" ){
+					//将当前被点击的基点设置为起始基点
+					startX = x;
+					startY = y;
+					return; 	
+				 }else{
+				 	console.log("你在点个钏钏..");
+				 }
+			});
+		}
+		//当前设置了起始基点
+		else{
+			var tmp1 = false;
+			$.each( tmpArr , function(index, val) {
+				 if( val.data("type") != "undefined" ){
+				 	tmp1 = true;
+				 }else{
+				 	tmp1 = false;
+				 }
+			});
+
+			//结束这条线的命运..
+			line_str += "M" + startX + "," + startY + "L" + x + "," + y;
+			if( line != undefined ){
+				line.remove();
+			}
+			startX = x;
+			startY = y;
+			line = generate_map_path( line_str );
+			if( tmp1 ){
+				// line.click(function(){
+				// 	console.log("hahah");
+				// });
+				line.hover(function() {
+					this.attr({
+						"stroke":"blue",
+						"stroke-width":4
+					});
+				}, function() {
+					this.attr({
+						"stroke":"red",
+						"stroke-width":2
+					});
+				});
+				line.attr({
+					"cursor":"pointer"
+				})
+				line_str = null;
+				startY = null;
+				startX = null;
+				line = null;
+			}
+		}
+	}
+	//当前点击的地方非基点
+	else{
+		if( startX == null || startY == null ){
+			alert("请先选择一个起始点,再开始规划路线..");
+			return;
+		}else{
+			//连线吧!!
+			line_str += "M" + startX + "," + startY + "L" + x + "," + y;
+			if( line != undefined ){
+				line.remove();
+			}
+			startX = x;
+			startY = y;
+			line = generate_map_path( line_str );
+		}
+	}
+})
+
+var generate_map_path = function( path_str ){
+	return paper.path( path_str ).attr({
+				"stroke":"red",
+				"stroke-width":2
+			});
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
